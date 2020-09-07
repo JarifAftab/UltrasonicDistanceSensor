@@ -1,0 +1,88 @@
+Ultrasonic Distance Sensor
+
+Introduction
+Hello, my name is Jarif. I began learning the Arduino not too long ago and decided to create a small project using my knowledge. I decided to create an ultrasonic distance sensor that uses the HC-SR04. The purpose of this project is to provide a cheap distance measurement tool that can be used in a variety of applications, such as alarms.
+
+How It Works
+How it works is that it uses a sound sensor (HC-SR04) to measure the distance from it, to an object. The sensor sends out a signal from one end and waits until an object obstructs the signal and causes it to bounce back. I use the time it takes for this and the speed of sound in room temperature to calculate the distance. This distance is then outputted to a display. In addition, if the distance is less than 0.1 m a buzzer turns on and an rgb led turns yellow. Otherwise, the rgb led is green to notify that the device is operational.
+
+Materials
+-Arduino UNO
+-Potentiometer
+-LCD Display
+-Active Buzzer
+-RGB LED
+-2 Current Limiting Resistors for the LED
+-Jumper wires
+
+Code
+#include <LiquidCrystal.h>
+int trigger = 12; //The trigger and echo are for the sound sensor. Trigger is where the signal is //released and echo is where it waits for the signal to bounce back
+int echo = 11;
+int travelTime = 0;
+
+int rs= 5;
+int en = 6;
+int d4 = 7;
+int d5 = 8;
+int d6 = 9;
+int d7 = 10;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7); //The object used by the Arduino to instantiate the LCD display
+
+float distance;
+
+int ledBuzzPin = 13; //The pin that outputs to the buzzer and led
+
+void setup() {
+  // put your setup code here, to run once:
+  
+//Sets up the pins as either input or output
+  pinMode(trigger, OUTPUT);
+  pinMode(echo, INPUT);
+  pinMode(ledBuzzPin, OUTPUT);
+ 
+ lcd.begin(16,2); //Sets up the display
+  Serial.begin(9600); //Sets up the serial monitor
+}
+
+void loop() {
+
+//To set up the cursor on the lcd display 
+ lcd.setCursor(0,0); //Horizontal column by row
+  lcd.print("The distance is:");
+  lcd.setCursor(0,1);
+  lcd.print(distance); //This prints at the selected position of the cursor on the display
+  
+  //This is for the echo and trigger
+  digitalWrite(trigger, LOW);
+  delayMicroseconds(10);
+  digitalWrite(trigger, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigger, LOW);
+  travelTime =pulseIn(echo, HIGH); //Looks for how long a pulse is, in this case high
+  delay(1000);
+  
+  //echo will stay high until the trigger hits echo, which is how travelTime works
+
+  distance  = travelTime*(1.0/1000000.0)*346.0; //speed*time = distance
+  distance/=2;
+  Serial.println(distance);
+
+  if(distance <= 0.1){ //if and only if the distance is less than 0.1 m turn the led yellow and activate the buzzer
+    digitalWrite(ledBuzzPin, HIGH);
+  }
+  else{
+    digitalWrite(ledBuzzPin, LOW);
+  }
+}
+
+Credits to Paul McWhorter for teaching me how to use the Arduino and its components
+
+Setup
+
+
+
+
+
+
+
